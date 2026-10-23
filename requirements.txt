@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pulp
+scikit-learn
+numpy
+
+# dev / testes
+pytest
+httpx
