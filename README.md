@@ -16,6 +16,7 @@ Faz parte de um conjunto de repositórios:
 
 | Repositório | Papel |
 |---|---|
+| [prognosisherba-visao](https://github.com/Zinorblatant-cpu/prognosisherba-visao) | Estação de medição por webcam (grade em cm, teorema de Pick) + API de leituras |
 | **prognosisherba-api** (este) | Previsões → otimização → alocação publicada |
 | [prognosisherba-painel](https://github.com/Zinorblatant-cpu/prognosisherba-painel) | Painel de planejamento do gestor |
 | [prognosisherba-podadores](https://github.com/Zinorblatant-cpu/prognosisherba-podadores) | App das equipes em campo |
