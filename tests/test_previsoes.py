@@ -4,12 +4,14 @@ Testes unitários e de integração para previsoes.py e os endpoints
 
 Rodar: pytest tests/test_previsoes.py -v
 """
+import pytest
 from fastapi.testclient import TestClient
 
 from previsoes import (
     LIMIAR_PODA_CM,
     carregar_previsoes,
     derivar_locais_de_poda,
+    derivar_prioridade,
     faixa_dificuldade,
 )
 from server import app
@@ -113,10 +115,30 @@ class TestDerivarLocaisDePoda:
         assert ra01["dataAlvo"] == "2026-09-14"
         assert ra01["alturaPrevistaCm"] == 10.5
 
-    def test_mapeia_nivel_alerta_para_prioridade(self):
+    def test_prioridade_vem_da_area_de_risco(self):
+        # RA-01 cruza com alerta "medio", mas fica em área de risco baixa.
         resultado = derivar_locais_de_poda(_previsoes_fake())
         ra01 = next(loc for loc in resultado["locais"] if loc["id"] == "RA-01")
-        assert ra01["prioridade"] == "media"
+        assert ra01["prioridade"] == "baixa"
+
+    def test_prioridade_diferencia_regioes_do_csv_real(self):
+        # Regressão: com o alerta da IA, as 4 regiões saíam todas "media".
+        resultado = derivar_locais_de_poda(carregar_previsoes())
+        prioridades = {loc["id"]: loc["prioridade"] for loc in resultado["locais"]}
+        assert prioridades == {"RA-01": "baixa", "RA-02": "media", "RA-03": "media", "RA-04": "alta"}
+
+
+class TestDerivarPrioridade:
+    @pytest.mark.parametrize("area, esperado", [("baixo", "baixa"), ("medio", "media"), ("alto", "alta")])
+    def test_mapeia_area_de_risco(self, area, esperado):
+        assert derivar_prioridade(area, "medio") == esperado
+
+    @pytest.mark.parametrize("alerta", ["alto", "critico"])
+    def test_alerta_urgente_promove_para_alta(self, alerta):
+        assert derivar_prioridade("baixo", alerta) == "alta"
+
+    def test_area_desconhecida_conta_como_media(self):
+        assert derivar_prioridade("sem-dado", "baixo") == "media"
 
     def test_regiao_sem_semana_no_limiar_fica_sem_alerta_no_horizonte(self):
         resultado = derivar_locais_de_poda(_previsoes_fake())

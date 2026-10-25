@@ -4,7 +4,7 @@ Previsões — adaptador entre a IA de crescimento e o horoprognosis
 A IA de crescimento de grama (`IAs---Challenge-Motiva/`, notebook
 `main_v3.ipynb`) prevê, por região, a altura da grama ao longo de um
 horizonte de N semanas (N vem do CSV carregado — não é fixo no código) e
-devolve `nivel_alerta` (baixo/medio/alto), `inclinacao_graus` (fixo por
+devolve `nivel_alerta` (baixo/medio/alto/critico), `inclinacao_graus` (fixo por
 região), `area_de_risco` e `houve_poda`. Esse formato não tem os campos
 que o solver de horoprognosis.py espera (`prioridade`, `dificuldade`) —
 este módulo faz a tradução: lê o CSV de previsão, acha a primeira semana
@@ -32,7 +32,25 @@ CAMINHO_CSV_PADRAO = os.path.join(os.path.dirname(__file__), "data", "previsoes_
 # 10,0 cm nenhuma região cruzaria e não haveria o que otimizar.
 LIMIAR_PODA_CM = 9.0
 
+# A prioridade vem da área de risco do trecho, não só do alerta da IA. O
+# alerta sozinho não diferencia ninguém: toda altura entre 7 e 10 cm é
+# "medio" para a IA, e como o limiar (9,0) cai nessa faixa, todas as
+# regiões cruzavam com prioridade "media" e o peso da FO ficava igual
+# para todo mundo. O alerta continua valendo como urgência: "alto" ou
+# "critico" na semana do prazo sobe o local para "alta", seja qual for a
+# área de risco.
 MAPA_PRIORIDADE = {"baixo": "baixa", "medio": "media", "alto": "alta"}
+ALERTAS_URGENTES = {"alto", "critico"}
+PRIORIDADE_PADRAO = "media"
+
+
+def derivar_prioridade(area_de_risco, nivel_alerta):
+    """Prioridade do local = área de risco do trecho, promovida a "alta"
+    quando o alerta da IA na semana do prazo é "alto" ou "critico".
+    Área de risco desconhecida conta como "media"."""
+    if nivel_alerta in ALERTAS_URGENTES:
+        return "alta"
+    return MAPA_PRIORIDADE.get(area_de_risco, PRIORIDADE_PADRAO)
 
 
 # ---------------------------------------------------------------------------
@@ -136,7 +154,7 @@ def derivar_locais_de_poda(previsoes_por_regiao, limiar=LIMIAR_PODA_CM):
             continue
         locais.append({
             "id": regiao["idRegiao"],
-            "prioridade": MAPA_PRIORIDADE[semana_alvo["nivelAlerta"]],
+            "prioridade": derivar_prioridade(regiao["areaDeRisco"], semana_alvo["nivelAlerta"]),
             "dificuldade": faixa_dificuldade(regiao["inclinacaoGraus"]),
             "dataAlvo": semana_alvo["data"],
             "alturaPrevistaCm": semana_alvo["alturaPrevistaCm"],

@@ -86,7 +86,10 @@ NS_REL = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 NS_PKG_REL = "{http://schemas.openxmlformats.org/package/2006/relationships}"
 
 _lock = threading.Lock()
-_ultimo_sync_em = 0.0
+# None = ainda não sincronizou neste processo. Não dá para usar 0.0: o
+# `time.monotonic()` conta a partir do boot, então numa máquina ou container
+# ligado há menos que o TTL a primeira sincronização seria pulada.
+_ultimo_sync_em = None
 
 
 # ---------------------------------------------------------------------------
@@ -345,7 +348,7 @@ def garantir_previsoes_atuais(forcar=False):
 
     with _lock:
         agora = time.monotonic()
-        recente = (agora - _ultimo_sync_em) < cfg["ttl"]
+        recente = _ultimo_sync_em is not None and (agora - _ultimo_sync_em) < cfg["ttl"]
         if not forcar and recente and os.path.exists(CAMINHO_CSV_DESTINO):
             return False
 

@@ -215,7 +215,7 @@ def _sync_configurado(monkeypatch, tmp_path):
     monkeypatch.setenv("GRAMA_SYNC_TTL_S", "0")
     destino = tmp_path / "previsoes.csv"
     monkeypatch.setattr(fp, "CAMINHO_CSV_DESTINO", str(destino))
-    monkeypatch.setattr(fp, "_ultimo_sync_em", 0.0)
+    monkeypatch.setattr(fp, "_ultimo_sync_em", None)
     return destino
 
 
