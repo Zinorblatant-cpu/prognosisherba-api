@@ -2,7 +2,7 @@
 Fixtures compartilhadas da suíte do backend.
 
 A suíte é hermética: nenhum teste toca a API externa de previsões. Como
-`fonte_previsoes` lê a chave de `backend/.env` via `os.environ.setdefault`,
+`fonte_previsoes` lê a chave de `.env` via `os.environ.setdefault`,
 basta deixar `GRAMA_API_KEY` já definida (vazia) no ambiente para que o
 `.env` do desenvolvedor não sobrescreva — e a sincronização fica desligada.
 

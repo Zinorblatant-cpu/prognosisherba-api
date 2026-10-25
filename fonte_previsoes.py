@@ -18,7 +18,7 @@ Por que reescrever o CSV em vez de servir a planilha direto:
 Sem dependência nova: `.xlsx` é um zip de XML, lido aqui com `zipfile` +
 `ElementTree`.
 
-Configuração (variáveis de ambiente, ou `backend/.env`):
+Configuração (variáveis de ambiente, ou `.env`):
 
     GRAMA_API_URL       endpoint da planilha  (default: produção)
     GRAMA_API_KEY       X-API-Key de leitura  — SEM ELA A SINCRONIZAÇÃO
@@ -97,7 +97,7 @@ _ultimo_sync_em = None
 # ---------------------------------------------------------------------------
 
 def _carregar_dotenv(caminho=None):
-    """Lê `backend/.env` para dentro de `os.environ` (sem sobrescrever o que
+    """Lê `.env` para dentro de `os.environ` (sem sobrescrever o que
     já veio do ambiente). Evita a dependência de python-dotenv para um
     arquivo de 4 linhas."""
     caminho = caminho or os.path.join(CAMINHO_BASE, ".env")

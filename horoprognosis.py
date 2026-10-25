@@ -29,7 +29,7 @@ equipes são intercambiáveis, a Função Objetivo sozinha é indiferente
 entre concentrar tudo numa equipe ou espalhar por todas — R4 desempata a
 favor de espalhar, sem nunca mudar quais locais entram no cronograma.
 
-Ver MODELO_MATEMATICO.md (pasta horoprognosis/) para a formulação
+Ver MODELO_MATEMATICO.md (raiz do repositório) para a formulação
 completa: conjuntos, parâmetros, função objetivo, restrições e o alerta de
 capacidade insuficiente.
 """
